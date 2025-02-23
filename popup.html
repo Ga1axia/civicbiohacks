@@ -3,18 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Map and Search</title>
-    <link rel="stylesheet" href="popup.css">
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <title>GBIF Data Extractor</title>
+    <style>
+        body {
+            width: 300px;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+        }
+        .data-item {
+            margin: 5px 0;
+        }
+        .label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        #no-data {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Map and Search</h1>
-        <div class="search-container">
-            <input type="text" id="search-bar" placeholder="Search for a location">
-            <button onclick="searchLocation()">Search</button>
+    <h2>GBIF Data Extractor</h2>
+    <div id="no-data">No GBIF data available. Please navigate to a GBIF occurrence page.</div>
+    <div id="data-container" style="display: none;">
+        <div class="data-item">
+            <span class="label">Latitude:</span>
+            <span id="latitude"></span>
         </div>
-        <div id="map"></div>
+        <div class="data-item">
+            <span class="label">Longitude:</span>
+            <span id="longitude"></span>
+        </div>
+        <div class="data-item">
+            <span class="label">Date Identified:</span>
+            <span id="collection-date"></span>
+        </div>
+        <div class="data-item">
+            <span class="label">Identified By:</span>
+            <span id="collector-name"></span>
+        </div>
     </div>
     <script src="popup.js"></script>
 </body>

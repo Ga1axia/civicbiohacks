@@ -1,10 +1,45 @@
-// Initialize the map
-let map = L.map('map').setView([51.505, -0.09], 2);  // Default view (latitude: 51.505, longitude: -0.09)
+// Function to update the popup with GBIF data
+function updatePopup(gbifData) {
+    const dataContainer = document.getElementById('data-container');
+    const noDataMessage = document.getElementById('no-data');
+    
+    if (gbifData && gbifData.data) {
+        // Show data container and hide no-data message
+        dataContainer.style.display = 'block';
+        noDataMessage.style.display = 'none';
+        
+        // Update the fields
+        document.getElementById('latitude').textContent = gbifData.data.latitude || 'Not available';
+        document.getElementById('longitude').textContent = gbifData.data.longitude || 'Not available';
+        document.getElementById('collection-date').textContent = gbifData.data.collectionDate || 'Not available';
+        document.getElementById('collector-name').textContent = gbifData.data.collectorName || 'Not available';
+    } else {
+        // Show no-data message and hide data container
+        dataContainer.style.display = 'none';
+        noDataMessage.style.display = 'block';
+    }
+}
 
-// Add OpenStreetMap tile layer
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
+// Listen for messages from the content script
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'updateGBIFData') {
+        updatePopup(message.data);
+    }
+});
+
+// When popup opens, query the active tab
+document.addEventListener('DOMContentLoaded', () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const currentTab = tabs[0];
+        if (currentTab && currentTab.url && currentTab.url.includes('gbif.org/occurrence/')) {
+            // Request data from content script
+            chrome.tabs.sendMessage(currentTab.id, { action: 'requestData' })
+                .catch(error => {
+                    console.error('Error requesting GBIF data:', error);
+                });
+        }
+    });
+});
 
 // Function to search for a location and move the map
 function searchLocation() {
@@ -12,7 +47,7 @@ function searchLocation() {
 
     if (searchTerm) {
         // Use the OpenCage Geocoding API to get latitude and longitude
-        const apiKey = 'YOUR_OPENCAGE_API_KEY';  // Replace with your OpenCage API Key
+        const apiKey = 'YOUR_OPENCAGE_API_KEY'; // Replace with your OpenCage API Key
         const url = `https://api.opencagedata.com/geocode/v1/json?q=${searchTerm}&key=${apiKey}`;
 
         fetch(url)
@@ -20,9 +55,14 @@ function searchLocation() {
             .then(data => {
                 if (data.results && data.results.length > 0) {
                     let location = data.results[0].geometry;
-                    map.setView([location.lat, location.lng], 13);  // Zoom to the found location
-                    L.marker([location.lat, location.lng]).addTo(map)  // Place a marker
-                        .bindPopup('Location: ' + searchTerm)
+                    
+                    // Zoom to the found location
+                    map.setView([location.lat, location.lng], 13);
+                    
+                    // Place a marker
+                    L.marker([location.lat, location.lng])
+                        .addTo(map)
+                        .bindPopup(`Location: ${searchTerm}`)
                         .openPopup();
                 } else {
                     alert('Location not found');
@@ -30,44 +70,14 @@ function searchLocation() {
             })
             .catch(error => {
                 alert('Error fetching location data');
+                console.error(error);
             });
     } else {
         alert('Please enter a search term');
     }
 }
 
-// Function to search for a location and move the map
-function searchLocation() {
-    let searchTerm = document.getElementById('search-bar').value;
-
-    if (searchTerm) {
-        // Use the OpenCage Geocoding API to get latitude and longitude
-        const apiKey = 'YOUR_OPENCAGE_API_KEY';  // Replace with your OpenCage API Key
-        const url = `https://api.opencagedata.com/geocode/v1/json?q=${searchTerm}&key=${apiKey}`;
-
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.results && data.results.length > 0) {
-                    let location = data.results[0].geometry;
-                    map.setView([location.lat, location.lng], 13);  // Zoom to the found location
-                    L.marker([location.lat, location.lng]).addTo(map)  // Place a marker
-                        .bindPopup('Location: ' + searchTerm)
-                        .openPopup();
-                } else {
-                    alert('Location not found');
-                }
-            })
-            .catch(error => {
-                alert('Error fetching location data');
-            });
-    } else {
-        alert('Please enter a search term');
-    }
-}
-
-
-//function for gemini plugin
+// Function for Gemini plugin
 async function getSocioeconomicBackground(date, latitude, longitude) {
     // API key should be stored securely in environment variables
     const GEMINI_API_KEY = 'AIzaSyDEMcuUWOuWH7fZYdARWgkUYGu9SPhO630';
@@ -75,7 +85,7 @@ async function getSocioeconomicBackground(date, latitude, longitude) {
     try {
         // Input validation
         if (!date || !latitude || !longitude) {
-            throw new Error('Date, latitude and longitude are required parameters');
+            throw new Error('Date, latitude, and longitude are required parameters');
         }
 
         // Format the prompt for Gemini
@@ -90,9 +100,7 @@ async function getSocioeconomicBackground(date, latitude, longitude) {
             },
             body: JSON.stringify({
                 contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
+                    parts: [{ text: prompt }]
                 }],
                 generationConfig: {
                     temperature: 0.7,
@@ -113,7 +121,6 @@ async function getSocioeconomicBackground(date, latitude, longitude) {
         }
 
         return data.candidates[0].content.parts[0].text;
-
     } catch (error) {
         console.error('Error fetching socioeconomic background:', error);
         return 'Unable to fetch socioeconomic background information.';
@@ -122,5 +129,5 @@ async function getSocioeconomicBackground(date, latitude, longitude) {
 
 // Example usage:
 // getSocioeconomicBackground("1950", 40.7128, -74.0060)
-//    .then(summary => console.log(summary))
-//    .catch(error => console.error(error));
+//     .then(summary => console.log(summary))
+//     .catch(error => console.error(error));

@@ -1,16 +1,27 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "Map and Search Extension",
     "description": "A basic Chrome extension with map and search functionality.",
     "version": "1.0",
-    "browser_action": {
-      "default_popup": "popup.html",
-      "default_icon": {
-        "16": "icon.png",
-        "48": "icon.png",
-        "128": "icon.png"
-      }
-    },
-    "permissions": ["activeTab"],
-    "content_security_policy": "script-src 'self' https://cdnjs.cloudflare.com; object-src 'self'"
-  }
+    "permissions": [
+        "activeTab",
+        "scripting"
+    ],
+    "host_permissions": [
+        "*://*.gbif.org/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": ["*://*.gbif.org/occurrence/*"],
+            "js": ["content.js"]
+        }
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icon.png",
+            "48": "icon.png",
+            "128": "icon.png"
+        }
+    }
+}
