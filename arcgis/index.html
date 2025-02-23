@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArcGIS Map App</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .app-header {
+            margin-bottom: 20px;
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 0 2px rgba(0,102,204,0.1);
+        }
+
+        button {
+            padding: 10px 16px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background-color: #0052a3;
+        }
+
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .panel h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .layer-list {
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .layer-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .layer-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .layer-list::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        .layer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #f8f8f8;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .layer-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .layer-content {
+            flex: 1;
+            margin-right: 15px;
+        }
+
+        .layer-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0066cc;
+            text-decoration: none;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .layer-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+            margin: 6px 0;
+        }
+
+        .layer-metadata {
+            font-size: 12px;
+            color: #888;
+            margin-top: 6px;
+        }
+
+        .add-layer-btn {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        #arcgis-link {
+            color: #0066cc;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        #arcgis-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <h1 class="app-title">ArcGIS Map Explorer</h1>
+        <div class="controls">
+            <input type="text" id="address-input" class="search-box" placeholder="Enter address to search...">
+            <input type="datetime-local" id="datetime-input">
+            <button id="search-btn">Search</button>
+        </div>
+    </div>
+
+    <div id="map"></div>
+    
+    <div class="panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2>Living Atlas Layers</h2>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <a id="arcgis-link" href="#" target="_blank">Open in ArcGIS</a>
+                <button id="browse-layers-btn">Refresh Living Atlas</button>
+            </div>
+        </div>
+        <div id="layer-list" class="layer-list">
+            <!-- Layer items will be added here dynamically -->
+        </div>
+    </div>
+    
+    <script type="module" src="/src/app.js"></script>
+</body>
+</html>
