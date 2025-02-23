@@ -1,37 +1,26 @@
-// Initialize the map
-let map = L.map('map').setView([51.505, -0.09], 2);  // Default view (latitude: 51.505, longitude: -0.09)
+// Function to switch between tabs
+function showTab(targetId) {
+    // Update tab visibility
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.getElementById(targetId).classList.add('active');
 
-// Add OpenStreetMap tile layer
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-// Function to search for a location and move the map
-function searchLocation() {
-    let searchTerm = document.getElementById('search-bar').value;
-
-    if (searchTerm) {
-        // Use the OpenCage Geocoding API to get latitude and longitude
-        const apiKey = 'YOUR_OPENCAGE_API_KEY';  // Replace with your OpenCage API Key
-        const url = `https://api.opencagedata.com/geocode/v1/json?q=${searchTerm}&key=${apiKey}`;
-
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.results && data.results.length > 0) {
-                    let location = data.results[0].geometry;
-                    map.setView([location.lat, location.lng], 13);  // Zoom to the found location
-                    L.marker([location.lat, location.lng]).addTo(map)  // Place a marker
-                        .bindPopup('Location: ' + searchTerm)
-                        .openPopup();
-                } else {
-                    alert('Location not found');
-                }
-            })
-            .catch(error => {
-                alert('Error fetching location data');
-            });
-    } else {
-        alert('Please enter a search term');
-    }
+    // Update button states
+    document.querySelectorAll('.nav-button').forEach(button => {
+        button.classList.remove('active');
+        if (button.getAttribute('data-target') === targetId) {
+            button.classList.add('active');
+        }
+    });
 }
+
+// Event listeners for navigation buttons
+document.querySelectorAll('.nav-button').forEach(button => {
+    button.addEventListener('click', () => {
+        showTab(button.getAttribute('data-target'));
+    });
+});
+
+// Initialize by showing the info tab
+showTab('info');

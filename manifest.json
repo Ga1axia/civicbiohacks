@@ -12,5 +12,5 @@
       }
     },
     "permissions": ["activeTab"],
-    "content_security_policy": "script-src 'self' https://cdnjs.cloudflare.com; object-src 'self'"
+    "content_security_policy": "script-src 'self' https://js.arcgis.com https://cdnjs.cloudflare.com; object-src 'self'"
   }
