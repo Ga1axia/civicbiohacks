@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bionomia Profile Viewer</title>
+    <style>
+        #bionomiaLinkContainer {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bionomia Profile Viewer</h1>
+    <p>Enter a Bionomia Profile ID (e.g., Q123456) to view the profile:</p>
+
+    <label for="bionomiaInput">Bionomia ID:</label>
+    <input type="text" id="bionomiaInput" placeholder="Enter Bionomia ID">
+    <button onclick="viewBionomiaProfile()">View Profile</button>
+
+    <div id="bionomiaLinkContainer" style="display: none;">
+        <p>Click below to view the Bionomia profile:</p>
+        <!-- The link to the Bionomia profile will be generated dynamically -->
+        <a id="bionomiaLink" target="_blank">View Bionomia Profile</a>
+    </div>
+
+    <script>
+        function viewBionomiaProfile() {
+            const bionomiaId = document.getElementById('bionomiaInput').value.trim();
+            const bionomiaLinkContainer = document.getElementById('bionomiaLinkContainer');
+            const bionomiaLink = document.getElementById('bionomiaLink');
+
+            if (bionomiaId) {
+                // Construct the Bionomia profile URL
+                const bionomiaProfileUrl = `https://bionomia.net/${bionomiaId}`;
+
+                // Set the link to the Bionomia profile URL
+                bionomiaLink.href = bionomiaProfileUrl;
+                bionomiaLink.innerHTML = `View Bionomia Profile: ${bionomiaId}`;
+
+                // Show the link container
+                bionomiaLinkContainer.style.display = 'block';
+            } else {
+                alert('Please enter a valid Bionomia ID.');
+            }
+        }
+    </script>
+</body>
+</html>
