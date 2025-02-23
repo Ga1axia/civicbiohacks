@@ -1,7 +1,23 @@
+// Function to format collector name
+function formatCollectorName(name) {
+    if (!name) return '';
+    
+    // First, handle names that might be in camelCase or PascalCase
+    const spacedName = name.replace(/([A-Z])/g, ' $1').trim();
+    
+    // Remove any extra spaces and ensure proper capitalization
+    return spacedName
+        .split(' ')
+        .filter(part => part.length > 0)
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+        .join(' ');
+}
+
 // Function to update the popup with GBIF data
 function updatePopup(gbifData) {
     const dataContainer = document.getElementById('data-container');
     const noDataMessage = document.getElementById('no-data');
+    const bionomiaFrame = document.getElementById('bionomia-frame');
     
     if (gbifData && gbifData.data) {
         // Show data container and hide no-data message
@@ -12,11 +28,24 @@ function updatePopup(gbifData) {
         document.getElementById('latitude').textContent = gbifData.data.latitude || 'Not available';
         document.getElementById('longitude').textContent = gbifData.data.longitude || 'Not available';
         document.getElementById('collection-date').textContent = gbifData.data.collectionDate || 'Not available';
-        document.getElementById('collector-name').textContent = gbifData.data.collectorName || 'Not available';
+        
+        // Format and display collector name
+        const collectorName = formatCollectorName(gbifData.data.collectorName);
+        document.getElementById('collector-name').textContent = collectorName || 'Not available';
+        
+        // Update Bionomia iframe if collector name is available
+        if (collectorName && collectorName !== 'Not available') {
+            const searchUrl = `https://bionomia.net/roster?q=${encodeURIComponent(collectorName)}`;
+            bionomiaFrame.src = searchUrl;
+            bionomiaFrame.style.display = 'block';
+        } else {
+            bionomiaFrame.style.display = 'none';
+        }
     } else {
         // Show no-data message and hide data container
         dataContainer.style.display = 'none';
         noDataMessage.style.display = 'block';
+        bionomiaFrame.style.display = 'none';
     }
 }
 
